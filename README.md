@@ -16,7 +16,7 @@ Installation
 	git clone git@github.com:pqcsf/falcon-sign-js.git
 	cd falcon-sign-js
 
-Qu
+Usage
 ---
 
 ##### Quick Start (FALCON512)
