@@ -21,19 +21,19 @@ Usage
 
 ##### Quick Start (FALCON512)
 
-	const const { getKernel } = require('.');
+	const { getKernel } = require('falcon-sign');
 	(async () => {
 
 	    let Falcon512 = await getKernel('falcon512_n3_v1'); //get falcon512_n3_v1 Kernel
 	    //gernkey
-	    let keypair = falcon512.genkey(); //return { sk, pk, genKeySeed }
+	    let keypair = Falcon512.genkey(); //return { sk, pk, genKeySeed }
 	    //sign
 	    let text = 'TEST MSG';
-	    let sign = falcon512.sign(text, key.sk);
+	    let sign = Falcon512.sign(text, keypair.sk);
 	    //verify
-	    console.log(falcon512.verify(sign, text, key.pk));
+	    console.log(Falcon512.verify(sign, text, keypair.pk));
 	    //create public key by private key
-	    let pk = falcon512.publicKeyCreate(key.sk);
+	    let pk = Falcon512.publicKeyCreate(keypair.sk);
 	})();
 
 
