@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "bulid-falcon512-n3-v1": "emcc ./kernel/n3_v1/main.cc ./kernel/n3_v1/*.c ./kernel/n3_v1/falcon512/*.c -o ./kernel/n3_v1/wasmFile/falcon512.js",
-	"bulid-falcon1024-n3-v1": "emcc ./kernel/n3_v1/main.cc ./kernel/n3_v1/*.c ./kernel/n3_v1/falcon1024/*.c -o ./kernel/n3_v1/wasmFile/falcon1024.js -D FALCON=1024"
+    "bulid-falcon1024-n3-v1": "emcc ./kernel/n3_v1/main.cc ./kernel/n3_v1/*.c ./kernel/n3_v1/falcon1024/*.c -o ./kernel/n3_v1/wasmFile/falcon1024.js -D FALCON=1024"
   },
   "repository": {
     "type": "git",
