@@ -24,8 +24,8 @@ const textEecoder = new TextEncoder("utf-8");
 
 const namePathTable = 
 {
-	falcon512_n3_v1: '../kernel/n3_v1/falcon512/index.js',
-	falcon1024_n3_v1: '../kernel/n3_v1/falcon1024/index.js',
+	falcon512_n3_v1: '../kernel/n3_v1/wasmFile/falcon512.js',
+	falcon1024_n3_v1: '../kernel/n3_v1/wasmFile/falcon1024.js',
 };
 const kernelTable = {};
 
