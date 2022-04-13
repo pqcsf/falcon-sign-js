@@ -22,8 +22,8 @@ Usage
 ##### Quick Start (FALCON512)
 
 	const { getKernel } = require('falcon-sign');
-	(async () => {
-
+	(async () => 
+	{
 	    let Falcon512 = await getKernel('falcon512_n3_v1'); //get falcon512_n3_v1 Kernel
 	    //gernkey
 	    let keypair = Falcon512.genkey(); //return { sk, pk, genKeySeed }
