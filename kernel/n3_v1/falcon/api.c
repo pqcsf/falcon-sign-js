@@ -1,30 +1,42 @@
+/*
+ * Encoding/decoding of keys and signatures.
+ *
+ * ==========================(LICENSE BEGIN)============================
+ *
+ * Copyright (c) 2022  Falcon JS(WASM) API
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ===========================(LICENSE END)=============================
+ *
+ * @author  PQCSF
+ */
+
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-#if FALCON == 1024
-#include "falcon1024/api.h"
-#include "falcon1024/inner.h"
-#define FALCONLEN 1024
-#define FALCONLOGLEN 10
-#define FALCON_KEYGEN_TEMP FALCON_KEYGEN_TEMP_10
-#else
-#include "falcon512/api.h"
-#include "falcon512/inner.h"
-#define FALCONLEN 512
-#define FALCONLOGLEN 9
-#define FALCON_KEYGEN_TEMP FALCON_KEYGEN_TEMP_9
-#endif
-
-#define TEMPALLOC
-#define NONCELEN 40
-#define SEEDLEN 48
-#include <stdio.h>
+#include "./api.h"
 
 static inline uint8_t * align_u16(void *tmp)
 {
 	uint8_t *atmp;
-
 	atmp = tmp;
 	if (((uintptr_t)atmp & 1u) != 0) {
 		atmp ++;
@@ -32,23 +44,18 @@ static inline uint8_t * align_u16(void *tmp)
 	return atmp;
 }
 
-/**
- * @param genKeySeed
- * @param pk
- * @param sk
- */
 bool falconGenkey(uint8_t *genKeySeed, uint8_t *pk, uint8_t *sk)
 {
-	TEMPALLOC union
+	union
 	{
 		uint8_t b[FALCON_KEYGEN_TEMP];
 		uint64_t dummy_u64;
 		fpr dummy_fpr;
 	} tmp;
 
-	TEMPALLOC int8_t f[FALCONLEN], g[FALCONLEN], F[FALCONLEN];
-	TEMPALLOC uint16_t h[FALCONLEN];
-	TEMPALLOC inner_shake256_context rng;
+	int8_t f[FALCONLEN], g[FALCONLEN], F[FALCONLEN];
+	uint16_t h[FALCONLEN];
+	inner_shake256_context rng;
 	size_t u, v;
 
 	/*
@@ -159,23 +166,23 @@ bool falconPublicKeyCreate(const uint8_t *sk, uint8_t *pk)
 
 bool falconSign(uint8_t *sm, uint8_t *m, const uint8_t *sk, uint8_t *salt)
 {
-	TEMPALLOC union 
+	union 
 	{
 		uint8_t b[72 * FALCONLEN];
 		uint64_t dummy_u64;
 		fpr dummy_fpr;
 	} tmp;
-	TEMPALLOC int8_t f[FALCONLEN], g[FALCONLEN], F[FALCONLEN], G[FALCONLEN];
-	TEMPALLOC union 
+	int8_t f[FALCONLEN], g[FALCONLEN], F[FALCONLEN], G[FALCONLEN];
+	union 
 	{
 		int16_t sig[FALCONLEN];
 		uint16_t hm[FALCONLEN];
 	} r;
 	
-	TEMPALLOC unsigned char* seed = salt;
-	TEMPALLOC unsigned char* nonce = salt + SEEDLEN;
-	TEMPALLOC unsigned char esig[CRYPTO_BYTES - 2 - NONCELEN];
-	TEMPALLOC inner_shake256_context sc;
+	unsigned char* seed = salt;
+	unsigned char* nonce = salt + SEEDLEN;
+	unsigned char esig[CRYPTO_BYTES - 2 - NONCELEN];
+	inner_shake256_context sc;
 	size_t u, v, sig_len;
 
 	//little-endian 8 byte
@@ -267,16 +274,16 @@ bool falconSign(uint8_t *sm, uint8_t *m, const uint8_t *sk, uint8_t *salt)
 
 bool falconVerify(uint8_t *sm, uint8_t *m, const uint8_t *pk)
 {
-	TEMPALLOC union 
+	union 
 	{
 		uint8_t b[2 * FALCONLEN];
 		uint64_t dummy_u64;
 		fpr dummy_fpr;
 	} tmp;
 	const unsigned char *esig;
-	TEMPALLOC uint16_t h[FALCONLEN], hm[FALCONLEN];
-	TEMPALLOC int16_t sig[FALCONLEN];
-	TEMPALLOC inner_shake256_context sc;
+	uint16_t h[FALCONLEN], hm[FALCONLEN];
+	int16_t sig[FALCONLEN];
+	inner_shake256_context sc;
 	uint16_t sig_len;
 
 	//little-endian 8 byte

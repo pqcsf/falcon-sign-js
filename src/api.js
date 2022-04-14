@@ -1,43 +1,28 @@
 const WasmBuf = require('./wasmBuf');
-const { isUint8Array, uint8ArrayWriteBigInt64LE, uint8ArrayConcat, uint8ArrayReadUint16BE } = require('./util.js');
+const { isUint8Array, uint8ArrayWriteBigInt64LE, uint8ArrayConcat, uint8ArrayReadUint16BE, randomBytes } = require('./util.js');
 
-let randomBytes;
-if (typeof window === 'undefined')
-{
-	const crypto = require('crypto')
-	randomBytes = (size) => 
-	{
-		return new Uint8Array(crypto.randomBytes(size));
-	};
-}
-else 
-{
-	randomBytes = (size) => 
-	{
-		let Buf = new Uint8Array(size);
-		crypto.getRandomValues(Buf);
-		return Buf;
-	};
-}
-// const textDecoder = new TextDecoder("utf-8");
 const textEecoder = new TextEncoder("utf-8");
 
-const namePathTable = 
+const algidPathTable = 
 {
 	falcon512_n3_v1: '../kernel/n3_v1/wasmFile/falcon512.js',
 	falcon1024_n3_v1: '../kernel/n3_v1/wasmFile/falcon1024.js',
 };
 const kernelTable = {};
 
-function api(kernel)
+function api(kernel, algid)
 {
 	return {
 
-		genkey(genkeySeed)
+		genkey(genkeySeed = randomBytes(kernel._getGenKeySeedByte()))
 		{
-			if(!genkeySeed) 
+			if(!isUint8Array(genkeySeed))
 			{
-				genkeySeed = randomBytes(kernel._getGenKeySeedByte());
+				throw new Error('Parameter Error');
+			}
+			if(genkeySeed.length !== kernel._getGenKeySeedByte())
+			{
+				throw new Error(`Seeds must be ${kernel._getGenKeySeedByte()} bytes`);
 			}
 
 			let wSeed = new WasmBuf(kernel, kernel._getGenKeySeedByte());
@@ -67,6 +52,15 @@ function api(kernel)
 		},
 		publicKeyCreate(sk)
 		{
+			if(!isUint8Array(sk))
+			{
+				throw new Error('Parameter Error');
+			}
+			if(sk.length !== kernel._getSkByte())
+			{
+				throw new Error(`sk must be ${kernel._getSkByte()} bytes`);
+			}
+
 			let wSk = new WasmBuf(kernel, sk);
 			let wPk = new WasmBuf(kernel, kernel._getPkByte());
 			let result = kernel._publicKeyCreate(wSk.wasmBufPtr, wPk.wasmBufPtr);
@@ -82,15 +76,23 @@ function api(kernel)
 			wSk.freeSafe();
 			return pk;
 		},
-		sign(message, sk, salt) 
+		sign(message, sk, salt = randomBytes(kernel._getCryptoSaltByte())) 
 		{
 			if(typeof message === 'string')
 			{
 				message = textEecoder.encode(message);
 			}
-			if(!salt) 
+			if(!isUint8Array(sk) || !isUint8Array(salt))
 			{
-				salt = randomBytes(kernel._getCryptoSaltByte());
+				throw new Error('Parameter Error');
+			}
+			if(sk.length !== kernel._getSkByte())
+			{
+				throw new Error(`sk must be ${kernel._getSkByte()} bytes`);
+			}
+			if(salt.length !== kernel._getCryptoSaltByte())
+			{
+				throw new Error(`salt must be ${kernel._getCryptoSaltByte()} bytes`);
 			}
 
 			let wSign = new WasmBuf(kernel, kernel._getCryptoByte());
@@ -124,6 +126,19 @@ function api(kernel)
 			{
 				message = textEecoder.encode(message);
 			}
+			if(!isUint8Array(signMsg) || !isUint8Array(pk))
+			{
+				throw new Error('Parameter Error');
+			}
+			if(signMsg.length > kernel._getCryptoByte())
+			{
+				throw new Error(`signMsg are limited to a maximum of ${kernel._getCryptoByte()} bytes`);
+			}
+			if(pk.length !== kernel._getPkByte())
+			{
+				throw new Error(`pk must be ${kernel._getPkByte()} bytes`);
+			}
+
 			let signMsgLength = uint8ArrayReadUint16BE(signMsg);
 			if(signMsgLength + kernel._getCryptoNonceByte() + 2 !== signMsg.length)
 			{
@@ -141,44 +156,53 @@ function api(kernel)
 			wMsg.free();
 			wPk.free();
 			return (result) ? true : false ;
-		}
+		},
+
+		//--- Get Parameters ---
+		algid,
+		get genkeySeedByte(){ return kernel._getGenKeySeedByte(); 	},
+		get skByte() 		{ return kernel._getPkByte(); 			},
+		get pkByte()		{ return kernel._getPkByte(); 			},
+		get signByte()		{ return kernel._getCryptoByte(); 		},
+		get signSaltByte()	{ return kernel._getCryptoSaltByte(); 	},
+		get signNonceByte()	{ return kernel._getCryptoNonceByte(); 	},
 	}
 }
 
-function getKernel(name)
+function getKernel(algid)
 {
-	if(!kernelTable[name]) 
+	if(!kernelTable[algid]) 
 	{
-		if(!namePathTable[name]) 
+		if(!algidPathTable[algid]) 
 		{
 			return;
 		}
-		let kernel = require(namePathTable[name]);
-		kernelTable[name] = 
+		let kernel = require(algidPathTable[algid]);
+		kernelTable[algid] = 
 		{ 
 			initCallback: [], 
-			methood: api(kernel),
+			methood: api(kernel, algid),
 			init: false
 		};
 		kernel.onRuntimeInitialized = () => 
 		{
-			kernelTable[name].init = true;
-			for(let i=0; i<kernelTable[name].initCallback.length; i++) 
+			kernelTable[algid].init = true;
+			for(let i=0; i<kernelTable[algid].initCallback.length; i++) 
 			{
-				kernelTable[name].initCallback[i](kernelTable[name].methood);
+				kernelTable[algid].initCallback[i](kernelTable[algid].methood);
 			}
 		};
 	}
-	if(!kernelTable[name].init) 
+	if(!kernelTable[algid].init) 
 	{	
 		return new Promise((res) => 
 		{
-			kernelTable[name].initCallback.push(res);
+			kernelTable[algid].initCallback.push(res);
 		});
 	}
-	return kernelTable[name].methood;
+	return kernelTable[algid].methood;
 }
 
-const getKernelNameList = Object.keys(namePathTable);
+const getKernelNameList = Object.keys(algidPathTable);
 
 module.exports = { getKernel, getKernelNameList };

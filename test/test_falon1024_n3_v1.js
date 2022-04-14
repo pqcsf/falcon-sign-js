@@ -2,11 +2,17 @@ const { getKernel, util } = require('../index');
 
 (async () =>
 {
-	const falcon1024 = await getKernel('falcon1024_n3_v1');
-	let key = falcon1024.genkey();
+	const falcon = await getKernel('falcon1024_n3_v1');
+	if(!falcon) 
+	{
+		return console.log('getKernel fail');;
+	}
+
+	console.log(`------------------ genkey ------------------`);
+	let key = falcon.genkey();
 	if(!key)
 	{
-		return;
+		return console.log('genkey fail');
 	}
 
 	console.log(`------------------ genkeySeed (${key.genkeySeed.length}) ----------`);
@@ -17,17 +23,23 @@ const { getKernel, util } = require('../index');
 	console.log(util.uint8ArrayToString(key.sk, 'base64'));
 
 	let text = 'TEST MSG';
-	let sign = falcon1024.sign(text, key.sk);
-	if(!sign) return;
-
+	let sign = falcon.sign(text, key.sk);
+	if(!sign) return console.log('sign fail');
 	console.log(`------------------ sign (${sign.length}) ------------------`);
 	console.log(util.uint8ArrayToString(sign, 'base64'));
 	console.log('------------------ verify ---------------');
-	console.log(falcon1024.verify(sign, text, key.pk));
+	console.log(falcon.verify(sign, text, key.pk));
 
-	let pk = falcon1024.publicKeyCreate(key.sk);
+	let pk = falcon.publicKeyCreate(key.sk);
 	console.log(`------------------ create pk (${pk.length}) ------------------`);
 	console.log(util.uint8ArrayToString(pk, 'base64'));
 	console.log(`------------------ pk eq ------------------`);
 	console.log(util.uint8ArrayEqual(pk, key.pk));
+
+	console.log(`------------------ const sign eq ------------------`);
+	let constSalt = util.randomBytes(falcon.signSaltByte);
+	let constSign1 = falcon.sign(text, key.sk, constSalt);
+	let constSign2 = falcon.sign(text, key.sk, constSalt);
+	console.log("constSign1 === constSign2 : ", util.uint8ArrayEqual(constSign1, constSign2));
+	console.log("randomSign1 === constSign2 : ", util.uint8ArrayEqual(sign, constSign2));
 })();

@@ -1,4 +1,4 @@
-const { isUint8Array } = require('./util.js');
+const { isUint8Array, isUint } = require('./util.js');
 
 class WasmBuf 
 {
@@ -8,13 +8,28 @@ class WasmBuf
 		if(isUint8Array(jsBuf))
 		{
 			this.length = jsBuf.length;
-			this.wasmBufPtr = kernel._newByte(this.length);
-			this.writeJsBuf(jsBuf);
+		}
+		else if(isUint(jsBuf))
+		{
+			this.length = jsBuf;
 		}
 		else
 		{
-			this.length = jsBuf;
+			throw new Error('Parameter Error');
+		}
+
+		if(this.length > 4294967295) //over uint32
+		{
+			this.wasmBufPtr = kernel._newByte(this.length & 0xffffffff, this.length >> 32 );
+		}
+		else 
+		{
 			this.wasmBufPtr = kernel._newByte(this.length);
+		}
+		
+		if(isUint8Array(jsBuf))
+		{
+			this.writeJsBuf(jsBuf);
 		}
 	}
 
@@ -22,7 +37,7 @@ class WasmBuf
 	{
 		if(!this.wasmBufPtr) 
 		{
-			throw 'Memory is freed';
+			throw new Error('Memory is freed');
 		}
 		this.kernel._freeBuf(this.wasmBufPtr);
 		delete this.wasmBufPtr;
@@ -31,7 +46,7 @@ class WasmBuf
 	{
 		if(!this.wasmBufPtr) 
 		{
-			throw 'Memory is freed';
+			throw new Error('Memory is freed');
 		}
 		this.kernel._freeBufSafe(this.wasmBufPtr, this.length);
 		delete this.wasmBufPtr;
@@ -40,24 +55,30 @@ class WasmBuf
 	{
 		if(!this.wasmBufPtr) 
 		{
-			throw 'Memory is freed';
+			throw new Error('Memory is freed');
 		}
-		for(let i=sourceStart; i<sourceStartEnd; i++)
+		if(sourceStartEnd !== source.length || sourceStart !== 0) 
 		{
-			this.kernel.HEAPU8[this.wasmBufPtr + targetStart + i] = source[i];
+			source = source.subarray(sourceStart, sourceStartEnd);
 		}
+		if((source.length + targetStart > this.length))
+		{
+			throw new Error('Exceeds the memory declaration range');
+		}
+		this.kernel.HEAPU8.set(source, this.wasmBufPtr + targetStart);
 	}
 	readJsBuf(length = this.length)
 	{
 		if(!this.wasmBufPtr) 
 		{
-			throw 'Memory is freed';
+			throw new Error('Memory is freed');
+		}
+		if(length > this.length)
+		{
+			throw new Error('Exceeds the memory declaration range');
 		}
 		let tempBuf = new Uint8Array(length);
-		for(let i=0; i<length; i++)
-		{
-			tempBuf[i] = this.kernel.HEAPU8[this.wasmBufPtr + i];
-		}
+		tempBuf.set(this.kernel.HEAPU8.subarray(this.wasmBufPtr, this.wasmBufPtr + length) );
 		return tempBuf;
 	}
 }

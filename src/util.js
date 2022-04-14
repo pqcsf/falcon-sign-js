@@ -3,6 +3,11 @@ function isUint8Array(buf)
     return buf && buf.BYTES_PER_ELEMENT === 1;
 }
 
+function isUint(v)
+{
+	return Number.isInteger(v) && (v >= 0);
+}
+
 function uint8ArrayToString(buf, decode = 'hex') 
 {
 	if(decode === 'hex')
@@ -100,15 +105,36 @@ function uint8ArrayEqual(buf1, buf2)
     return true;
 }
 
+let randomBytes;
+if (typeof window === 'undefined')
+{
+	const crypto = require('crypto')
+	randomBytes = (size) => 
+	{
+		return new Uint8Array(crypto.randomBytes(size));
+	};
+}
+else 
+{
+	randomBytes = (size) => 
+	{
+		let Buf = new Uint8Array(size);
+		crypto.getRandomValues(Buf);
+		return Buf;
+	};
+}
+
 module.exports =
 { 
-	isUint8Array, 
-	uint8ArrayToString, 
-	base64ToUint8Array, 
+	isUint8Array,
+	isUint,
+	uint8ArrayToString,
+	base64ToUint8Array,
 	hexStringToUint8Array,
-	uint8ArrayConcat, 
-	uint8ArrayWriteBigInt64LE, 
+	uint8ArrayConcat,
+	uint8ArrayWriteBigInt64LE,
 	uint8ArrayReadBigInt64LE,
 	uint8ArrayReadUint16BE,
-	uint8ArrayEqual
+	uint8ArrayEqual,
+	randomBytes
 };
