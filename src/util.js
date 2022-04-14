@@ -27,23 +27,37 @@ function uint8ArrayToString(buf, decode = 'hex')
 
 function base64ToUint8Array(base64Str) 
 {
-	let str = atob(base64Str);
-    let buf = new Uint8Array(str.length);
-    for (let i=0; i<buf.length; i++) 
+	try 
 	{
-        buf[i] = str.charCodeAt(i);
-    }
-    return buf;
+		let str = atob(base64Str);
+		let buf = new Uint8Array(str.length);
+		for (let i=0; i<buf.length; i++) 
+		{
+			buf[i] = str.charCodeAt(i);
+		}
+		return buf;
+	} 
+	catch(e) 
+	{
+		return;
+	}
 }
 
 function hexStringToUint8Array(hexStr) 
 {
-	let buf = new Uint8Array(hexStr.length / 2);
-	for(let i=0; i<buf.length; i++)
+	try 
 	{
-		buf[i] = parseInt(hexStr.substr(i * 2, 2), 16);
+		let buf = new Uint8Array(hexStr.length / 2);
+		for(let i=0; i<buf.length; i++)
+		{
+			buf[i] = parseInt(hexStr.substr(i * 2, 2), 16);
+		}
+		return buf;
+	} 
+	catch(e) 
+	{
+		return;
 	}
-	return buf;
 }
 
 function uint8ArrayConcat(bufs)
@@ -63,30 +77,28 @@ function uint8ArrayConcat(bufs)
 	return buf;
 }
 
-function uint8ArrayWriteBigInt64LE(bufs, ui64, offset=0)
+function uint8ArrayWriteBigUInt64LE(buf, ui64, offset=0)
 {
 	for(let i=0; i<8; i++)
 	{
-		bufs[offset + i] = parseInt((ui64 >> BigInt(i * 8)) & (0xffn));
+		buf[offset + i] = parseInt((ui64 >> BigInt(i * 8)) & (0xffn));
 	}
-
-	return ui64;
 }
 
-function uint8ArrayReadBigInt64LE(bufs, offset=0)
+function uint8ArrayReadBigUInt64LE(buf, offset=0)
 {
 	let ui64 = 0n;
 	for(let i=0; i<8; i++)
 	{
-		ui64 += (BigInt(bufs[i + offset]) << BigInt((i * 8)));
+		ui64 += (BigInt(buf[i + offset]) << BigInt((i * 8)));
 	}
 
 	return ui64;
 }
 
-function uint8ArrayReadUint16BE(bufs, offset=0)
+function uint8ArrayReadUint16BE(buf, offset=0)
 {
-	return ((bufs[offset] << 8) | bufs[1 + offset]);
+	return ((buf[offset] << 8) | buf[1 + offset]);
 }
 
 function uint8ArrayEqual(buf1, buf2)
@@ -132,8 +144,8 @@ module.exports =
 	base64ToUint8Array,
 	hexStringToUint8Array,
 	uint8ArrayConcat,
-	uint8ArrayWriteBigInt64LE,
-	uint8ArrayReadBigInt64LE,
+	uint8ArrayWriteBigUInt64LE,
+	uint8ArrayReadBigUInt64LE,
 	uint8ArrayReadUint16BE,
 	uint8ArrayEqual,
 	randomBytes

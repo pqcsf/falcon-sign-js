@@ -1,5 +1,5 @@
 const WasmBuf = require('./wasmBuf');
-const { isUint8Array, uint8ArrayWriteBigInt64LE, uint8ArrayConcat, uint8ArrayReadUint16BE, randomBytes } = require('./util.js');
+const { isUint8Array, uint8ArrayWriteBigUInt64LE, uint8ArrayConcat, uint8ArrayReadUint16BE, randomBytes } = require('./util.js');
 
 const textEecoder = new TextEncoder("utf-8");
 
@@ -99,7 +99,7 @@ function api(kernel, algid)
 			let wSk = new WasmBuf(kernel, sk);
 			let wSalt = new WasmBuf(kernel, salt);
 			let msgLength = new Uint8Array(8);
-			uint8ArrayWriteBigInt64LE(msgLength, BigInt(message.length));
+			uint8ArrayWriteBigUInt64LE(msgLength, BigInt(message.length));
 			let wMsg = new WasmBuf(kernel, uint8ArrayConcat([msgLength, message]));
 			
 			let result = kernel._sign(wSign.wasmBufPtr, wMsg.wasmBufPtr, wSk.wasmBufPtr, wSalt.wasmBufPtr);
@@ -148,7 +148,7 @@ function api(kernel, algid)
 			let wSign = new WasmBuf(kernel, signMsg);
 			let wPk = new WasmBuf(kernel, pk);
 			let msgLength = new Uint8Array(8);
-			uint8ArrayWriteBigInt64LE(msgLength, BigInt(message.length));
+			uint8ArrayWriteBigUInt64LE(msgLength, BigInt(message.length));
 			let wMsg = new WasmBuf(kernel, uint8ArrayConcat([msgLength, message]));
 
 			let result = kernel._verify(wSign.wasmBufPtr, wMsg.wasmBufPtr, wPk.wasmBufPtr);
