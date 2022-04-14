@@ -34,6 +34,8 @@
 #include <stdint.h>
 #include "./api.h"
 
+#define FALCON_TMPSIZE_MAKEPUB(logn) ((6u << (logn)) + 1)
+
 static inline uint8_t * align_u16(void *tmp)
 {
 	uint8_t *atmp;
@@ -108,8 +110,6 @@ bool falconGenkey(uint8_t *genKeySeed, uint8_t *pk, uint8_t *sk)
 	return 1;
 }
 
-#define FALCON_TMPSIZE_MAKEPUB(logn) ((6u << (logn)) + 1)
-
 bool falconPublicKeyCreate(const uint8_t *sk, uint8_t *pk)
 {
 	uint8_t tmp[FALCON_TMPSIZE_MAKEPUB(FALCONLOGLEN)];
@@ -130,15 +130,15 @@ bool falconPublicKeyCreate(const uint8_t *sk, uint8_t *pk)
 	f = (int8_t *)tmp;
 	g = f + n;
 	u = 1;
-	v = Zf(trim_i8_decode)(f, FALCONLOGLEN, Zf(max_fg_bits)[FALCONLOGLEN],
-		sk + u, CRYPTO_SECRETKEYBYTES - u);
-	if (v == 0) {
+	v = Zf(trim_i8_decode)(f, FALCONLOGLEN, Zf(max_fg_bits)[FALCONLOGLEN], sk + u, CRYPTO_SECRETKEYBYTES - u);
+	if (v == 0) 
+	{
 		return 0;
 	}
 	u += v;
-	v = Zf(trim_i8_decode)(g, FALCONLOGLEN, Zf(max_fg_bits)[FALCONLOGLEN],
-		sk + u, CRYPTO_SECRETKEYBYTES - u);
-	if (v == 0) {
+	v = Zf(trim_i8_decode)(g, FALCONLOGLEN, Zf(max_fg_bits)[FALCONLOGLEN], sk + u, CRYPTO_SECRETKEYBYTES - u);
+	if (v == 0)
+	{
 		return 0;
 	}
 
