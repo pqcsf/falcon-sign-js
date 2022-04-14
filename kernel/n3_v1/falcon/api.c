@@ -32,7 +32,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "./api.h"
+#include "api.h"
 
 #define FALCON_TMPSIZE_MAKEPUB(logn) ((6u << (logn)) + 1)
 
