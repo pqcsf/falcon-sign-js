@@ -11,9 +11,9 @@ The main API consists of three entry points:
 Acquisition of core modules for algorithms
 
 #### `getKernelNameList(): string[]`
-Acquisition of core modules for algorithms
+Get a list of supported algorithm names
 
-#### util: object
+#### `util: object`
 Some common utility programs
 
 Kernel
@@ -29,7 +29,7 @@ Generate key pair, if the input genkeySeed is not empty, then use genkeySeed to 
 Generate public key using private key
 
 #### `Kernel.sign(message: Uint8Array | string, sk: Uint8Array, salt?: Uint8Array)): Uint8Array | undefined`
-Create a Falcon signature. If the salt is empty, generate it randomly
+Create a Falcon signature. If the salt is empty, generate it randomly.
 
 #### `Kernel.verify(signMsg: Uint8Array, message: Uint8Array, pk: Uint8Array) : boolean`
 Verify a Falcon signature.
