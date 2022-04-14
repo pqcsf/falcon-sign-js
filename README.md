@@ -69,6 +69,10 @@ Seed length according to: Falcon512.genkeySeedByte, different algorithms may hav
 
 solt length according to: Falcon512.signSaltByte, different algorithms may have different lengths.
 
+API
+---
+The API is here: [API Reference](api.md)
+
 License
 ---
 The license is here: [License](LICENSE)
