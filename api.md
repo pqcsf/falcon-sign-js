@@ -60,27 +60,27 @@ Number of bytes of signature's random nonce. It is part of the random salt.
 util
 ---
 
-#### `isUint8Array(data: any): boolean`
+#### `util.isUint8Array(data: any): boolean`
 
-#### `isUint(data: any): boolean`
+#### `util.isUint(data: any): boolean`
 
-#### `uint8ArrayToString(buf: Uint8Array, decode: string = 'hex'): string`
+#### `util.uint8ArrayToString(buf: Uint8Array, decode: string = 'hex'): string`
 
-#### `base64ToUint8Array(data: string): Uint8Array | undefined`
+#### `util.base64ToUint8Array(data: string): Uint8Array | undefined`
 
-#### `hexStringToUint8Array(data: string): Uint8Array | undefined`
+#### `util.hexStringToUint8Array(data: string): Uint8Array | undefined`
 
-#### `uint8ArrayConcat(bufs: Uint8Array[]): Uint8Array`
+#### `util.uint8ArrayConcat(bufs: Uint8Array[]): Uint8Array`
 
-#### `uint8ArrayWriteBigUInt64LE(buf: Uint8Array, ui64: BigInt, offset: number = 0): undefined`
+#### `util.uint8ArrayWriteBigUInt64LE(buf: Uint8Array, ui64: BigInt, offset: number = 0): undefined`
 
-#### `uint8ArrayReadBigUInt64LE(buf: Uint8Array, offset: number = 0): BigInt`
+#### `util.uint8ArrayReadBigUInt64LE(buf: Uint8Array, offset: number = 0): BigInt`
 
-#### `uint8ArrayReadUint16BE(buf: Uint8Array, offset: number = 0): number`
+#### `util.uint8ArrayReadUint16BE(buf: Uint8Array, offset: number = 0): number`
 
-#### `uint8ArrayEqual(buf1: Uint8Array, buf1: Uint8Array): boolean`
+#### `util.uint8ArrayEqual(buf1: Uint8Array, buf1: Uint8Array): boolean`
 
-#### `randomBytes(size: number): number`
+#### `util.randomBytes(size: number): number`
 
 
 
