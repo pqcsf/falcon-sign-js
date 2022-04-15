@@ -103,13 +103,13 @@ function uint8ArrayReadUint16BE(buf, offset=0)
 
 function uint8ArrayEqual(buf1, buf2)
 {
-    if (buf1.length != buf2.length) 
+    if (buf1.length !== buf2.length) 
 	{
 		return false;
 	}
-    for (var i = 0 ; i != buf1.byteLength ; i++)
+    for (let i = 0; i<=buf1.length; i++)
     {
-        if (buf1[i] !== buf1[i]) 
+        if (buf1[i] !== buf2[i]) 
 		{
 			return false;
 		}
