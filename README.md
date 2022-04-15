@@ -58,7 +58,7 @@ Only the name of getKernel needs to be changed. (falcon512_n3_v1 -> falcon1024_n
 ##### Use specific seeds to generate key pairs
 
 	let seed = new Uint8Array(.....);
-	let keypair = Falcon512.genkey();
+	let keypair = Falcon512.genkey(seed);
 
 Seed length according to: Falcon512.genkeySeedByte, different algorithms may have different lengths.
 
