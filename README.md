@@ -57,14 +57,14 @@ Only the name of getKernel needs to be changed. (falcon512_n3_v1 -> falcon1024_n
 
 ##### Use specific seeds to generate key pairs
 
-	let seed = Uint8Array(.....);
+	let seed = new Uint8Array(.....);
 	let keypair = Falcon512.genkey();
 
 Seed length according to: Falcon512.genkeySeedByte, different algorithms may have different lengths.
 
 ##### Generate the same signature
 
-	const salt = Uint8Array(.....);
+	const salt = new Uint8Array(.....);
 	let sign = Falcon512.sign(text, keypair.sk, salt);
 
 Salt length according to: Falcon512.signSaltByte, different algorithms may have different lengths.
