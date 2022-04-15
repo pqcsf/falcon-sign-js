@@ -48,7 +48,15 @@ class WasmBuf
 		{
 			throw new Error('Memory is freed');
 		}
-		this.kernel._freeBufSafe(this.wasmBufPtr, this.length);
+		if(this.length > 4294967295) //over uint32
+		{
+			this.kernel._freeBufSafe(this.length & 0xffffffff, this.length >> 32);
+		}
+		else 
+		{
+			this.kernel._freeBufSafe(this.wasmBufPtr, this.length);
+		}
+		
 		delete this.wasmBufPtr;
 	}
 	writeJsBuf(source, targetStart=0, sourceStart=0, sourceStartEnd=source.length)

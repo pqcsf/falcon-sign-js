@@ -80,7 +80,7 @@ util
 
 #### `util.uint8ArrayEqual(buf1: Uint8Array, buf1: Uint8Array): boolean`
 
-#### `util.randomBytes(size: number): number`
+#### `util.randomBytes(size: number): Uint8Array`
 
 
 

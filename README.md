@@ -64,10 +64,10 @@ Seed length according to: Falcon512.genkeySeedByte, different algorithms may hav
 
 ##### Generate the same signature
 
-	const solt = Uint8Array(.....);
-	let sign = Falcon512.sign(text, keypair.sk, solt);
+	const salt = Uint8Array(.....);
+	let sign = Falcon512.sign(text, keypair.sk, salt);
 
-Solt length according to: Falcon512.signSaltByte, different algorithms may have different lengths.
+Salt length according to: Falcon512.signSaltByte, different algorithms may have different lengths.
 
 API
 ---
