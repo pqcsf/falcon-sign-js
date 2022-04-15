@@ -1,6 +1,6 @@
 {
   "name": "falcon-sign",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The JS module of the post-quantum digital signature algorithm (FALCON).",
   "main": "index.js",
   "scripts": {
