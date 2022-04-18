@@ -72,12 +72,6 @@ util
 
 #### `util.uint8ArrayConcat(bufs: Uint8Array[]): Uint8Array`
 
-#### `util.uint8ArrayWriteBigUInt64LE(buf: Uint8Array, ui64: BigInt, offset: number = 0): undefined`
-
-#### `util.uint8ArrayReadBigUInt64LE(buf: Uint8Array, offset: number = 0): BigInt`
-
-#### `util.uint8ArrayReadUint16BE(buf: Uint8Array, offset: number = 0): number`
-
 #### `util.uint8ArrayEqual(buf1: Uint8Array, buf1: Uint8Array): boolean`
 
 #### `util.randomBytes(size: number): Uint8Array`

@@ -77,30 +77,6 @@ function uint8ArrayConcat(bufs)
 	return buf;
 }
 
-function uint8ArrayWriteBigUInt64LE(buf, ui64, offset=0)
-{
-	for(let i=0; i<8; i++)
-	{
-		buf[offset + i] = parseInt((ui64 >> BigInt(i * 8)) & (0xffn));
-	}
-}
-
-function uint8ArrayReadBigUInt64LE(buf, offset=0)
-{
-	let ui64 = 0n;
-	for(let i=0; i<8; i++)
-	{
-		ui64 += (BigInt(buf[i + offset]) << BigInt((i * 8)));
-	}
-
-	return ui64;
-}
-
-function uint8ArrayReadUint16BE(buf, offset=0)
-{
-	return ((buf[offset] << 8) | buf[1 + offset]);
-}
-
 function uint8ArrayEqual(buf1, buf2)
 {
 	if (buf1.length !== buf2.length) 
@@ -144,9 +120,6 @@ module.exports =
 	base64ToUint8Array,
 	hexStringToUint8Array,
 	uint8ArrayConcat,
-	uint8ArrayWriteBigUInt64LE,
-	uint8ArrayReadBigUInt64LE,
-	uint8ArrayReadUint16BE,
 	uint8ArrayEqual,
 	randomBytes
 };

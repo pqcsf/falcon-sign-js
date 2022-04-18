@@ -1,5 +1,5 @@
 const WasmBuf = require('./wasmBuf');
-const { isUint8Array, uint8ArrayWriteBigUInt64LE, uint8ArrayConcat, uint8ArrayReadUint16BE, randomBytes } = require('./util.js');
+const { isUint8Array, uint8ArrayConcat, randomBytes } = require('./util.js');
 
 const textEecoder = new TextEncoder("utf-8");
 
@@ -99,7 +99,7 @@ function api(kernel, algid)
 			let wSk = new WasmBuf(kernel, sk);
 			let wSalt = new WasmBuf(kernel, salt);
 			let msgLength = new Uint8Array(8);
-			uint8ArrayWriteBigUInt64LE(msgLength, BigInt(message.length));
+			new DataView(msgLength.buffer).setBigUint64(0, BigInt(message.length), 1);
 			let wMsg = new WasmBuf(kernel, uint8ArrayConcat([msgLength, message]));
 			
 			let result = kernel._sign(wSign.wasmBufPtr, wMsg.wasmBufPtr, wSk.wasmBufPtr, wSalt.wasmBufPtr);
@@ -113,7 +113,7 @@ function api(kernel, algid)
 			}
 			
 			let signMsg = wSign.readJsBuf();
-			let signLen = uint8ArrayReadUint16BE(signMsg) + kernel._getCryptoNonceByte() + 2;
+			let signLen = new DataView(signMsg.buffer).getUint16(0) + kernel._getCryptoNonceByte() + 2;
 			wSign.free();
 			wMsg.free();
 			wSk.freeSafe();
@@ -138,8 +138,8 @@ function api(kernel, algid)
 			{
 				throw new Error(`pk must be ${kernel._getPkByte()} bytes`);
 			}
-
-			let signMsgLength = uint8ArrayReadUint16BE(signMsg);
+			
+			let signMsgLength = new DataView(signMsg.buffer).getUint16(0);
 			if(signMsgLength + kernel._getCryptoNonceByte() + 2 !== signMsg.length)
 			{
 				return false;
@@ -148,7 +148,7 @@ function api(kernel, algid)
 			let wSign = new WasmBuf(kernel, signMsg);
 			let wPk = new WasmBuf(kernel, pk);
 			let msgLength = new Uint8Array(8);
-			uint8ArrayWriteBigUInt64LE(msgLength, BigInt(message.length));
+			new DataView(msgLength.buffer).setBigUint64(0, BigInt(message.length), 1);
 			let wMsg = new WasmBuf(kernel, uint8ArrayConcat([msgLength, message]));
 
 			let result = kernel._verify(wSign.wasmBufPtr, wMsg.wasmBufPtr, wPk.wasmBufPtr);
