@@ -4,8 +4,8 @@
   "description": "The JS module of the post-quantum digital signature algorithm (FALCON).",
   "main": "index.js",
   "scripts": {
-    "bulid-falcon512-n3-v1": "emcc ./kernel/n3_v1/wasmapi.cc ./kernel/n3_v1/falcon/*.c -o ./kernel/n3_v1/wasmFile/falcon512.js",
-    "bulid-falcon1024-n3-v1": "emcc ./kernel/n3_v1/wasmapi.cc ./kernel/n3_v1/falcon/*.c -o ./kernel/n3_v1/wasmFile/falcon1024.js -D FALCON=1024"
+    "build-falcon512-n3-v1": "emcc ./kernel/n3_v1/wasmapi.cc ./kernel/n3_v1/falcon/*.c -o ./kernel/n3_v1/wasmFile/falcon512.js",
+    "build-falcon1024-n3-v1": "emcc ./kernel/n3_v1/wasmapi.cc ./kernel/n3_v1/falcon/*.c -o ./kernel/n3_v1/wasmFile/falcon1024.js -D FALCON=1024"
   },
   "repository": {
     "type": "git",
